@@ -1,99 +1,77 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EduConnectService } from '../../services/educonnect.service';
-import { Teacher } from '../../models/Teacher';
-import { Course } from '../../models/Course';
 
 @Component({
-  selector: 'app-coursecreate',
+  selector: 'app-course-create',
   templateUrl: './coursecreate.component.html',
   styleUrls: ['./coursecreate.component.scss']
 })
 export class CourseCreateComponent implements OnInit {
-  courseForm!: FormGroup;
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
+  courseForm: FormGroup;
+  submitted = false;
+  successMessage = '';
+  errorMessage = '';
 
-  teacher: Teacher | null = null;
-  teacherId: number = 0;
-
-  constructor(
-    private fb: FormBuilder,
-    private service: EduConnectService
-  ) {}
-
-  ngOnInit(): void {
+  constructor(private fb: FormBuilder, private eduService: EduConnectService) {
     this.courseForm = this.fb.group({
       courseId: [0],
       courseName: ['', Validators.required],
-      description: [''],
+      description: ['', [Validators.required, Validators.maxLength(500)]],
       teacherId: [0, Validators.required]
     });
+  }
 
-    // Day 23 hidden test expects this call
-    this.service.getTeacherById(this.teacherId).subscribe({
-      next: (teacher: Teacher) => {
-        this.teacher = teacher;
-        this.courseForm.patchValue({
-          teacherId: teacher.teacherId
-        });
+  ngOnInit(): void {
+   
+    const teacherId = Number(localStorage.getItem('teacher_id')) || 0;
+
+    this.eduService.getTeacherById(teacherId).subscribe({
+      next: (teacher) => {
+        console.log('Loaded teacher', teacher);
+       
+        this.courseForm.patchValue({ teacherId: teacher.teacherId });
       },
-      error: () => {
-        this.teacher = null;
+      error: (err) => {
+        console.error('Failed to load teacher', err);
       }
     });
   }
 
+  get f() {
+    return this.courseForm.controls;
+  }
+
   onSubmit(): void {
-    this.successMessage = null;
-    this.errorMessage = null;
+    this.submitted = true;
+    this.successMessage = '';
+    this.errorMessage = '';
 
     if (this.courseForm.invalid) {
-      this.courseForm.markAllAsTouched();
-      this.errorMessage = 'Please fill out all fields correctly.';
+      this.errorMessage = 'Please fix errors in the form.';
       return;
     }
 
-    const value = this.courseForm.value;
 
-    const teacherToUse =
-      this.teacher ??
-      new Teacher(
-        value.teacherId ?? 0,
-        '',
-        '',
-        '',
-        '',
-        0
-      );
-
-    const course = new Course(
-      value.courseId ?? 0,
-      value.courseName,
-      value.description,
-      teacherToUse
-    );
-
-    this.service.addCourse(course).subscribe({
+    this.eduService.addCourse(this.courseForm.value).subscribe({
       next: () => {
         this.successMessage = 'Course created successfully!';
-        this.errorMessage = null;
+      
+        setTimeout(() => {
+          this.courseForm.reset({ courseId: 0, courseName: '', description: '', teacherId: 0 });
+          this.submitted = false;
+        }, 0);
       },
       error: () => {
         this.errorMessage = 'Failed to create course.';
-        this.successMessage = null;
       }
     });
   }
 
   resetForm(): void {
-    this.courseForm.reset({
-      courseId: 0,
-      courseName: '',
-      description: '',
-      teacherId: 0
-    });
-    this.successMessage = null;
-    this.errorMessage = null;
+    this.courseForm.reset({ courseId: 0, courseName: '', description: '', teacherId: 0 });
+    this.submitted = false;
+    this.successMessage = '';
+    this.errorMessage = '';
   }
-}
+} 

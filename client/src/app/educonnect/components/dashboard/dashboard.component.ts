@@ -1,229 +1,164 @@
+
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { EduconnectService } from '../../services/educonnect.service';
-import { AuthService } from '../../../auth/services/auth.service';
+import { Course } from '../../models/Course';
+import { Enrollment } from '../../models/Enrollment';
+import { Student } from '../../models/Student';
+import { EduConnectService } from '../../services/educonnect.service';
+
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  role: string = '';
-
-  // Teacher-side
-  teacherId: number | null = null;
   teacherDetails: any;
-  students: any[] = [];
-  teacherEnrollments: any[] = [];
-
-  // Student-side
-  studentId: number | null = null;
   studentDetails: any;
-  enrollments: any[] = [];
-  courses: any[] = [];
+  courses: Course[] = [];
+  enrollments: Enrollment[] = [];
+  students: Student[] = [];
 
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
+  role: string | null | undefined;
+  userId: number | undefined;
+  studentId: number = 0;
+  teacherId: number = 0;
 
-  constructor(
-    private educonnectService: EduconnectService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  selectedCourseId: number | undefined;
+  selectedCourseEnrollment: Enrollment[] = [];
+
+  constructor(private educonnectService: EduConnectService, private router: Router) { }
 
   ngOnInit(): void {
-    const auth: any = this.authService;
-    this.role = auth.getRole ? auth.getRole() : '';
-
-    if (this.role === 'STUDENT') {
-      this.studentId = auth.getStudentId ? auth.getStudentId() : this.studentId;
-      if (this.studentId !== null) {
-        this.loadStudentData();
-      }
-    }
-
+    this.role = localStorage.getItem("role");
+    this.userId = Number(localStorage.getItem("user_id"));
+    this.teacherId = Number(localStorage.getItem("teacher_id"));
+    this.studentId = Number(localStorage.getItem("student_id"));
     if (this.role === 'TEACHER') {
-      this.teacherId = auth.getTeacherId ? auth.getTeacherId() : this.teacherId;
-      if (this.teacherId !== null) {
-        this.loadTeacherData();
-      }
+      console.log('loadTeacherData');
+      this.loadTeacherData();
+    }
+    else {
+      console.log('loadStudentData');
+      this.loadStudentData();
     }
   }
 
-  // ---------------- STUDENT ----------------
-  loadStudentData(): void {
-    if (this.studentId === null) return;
-
-    const service: any = this.educonnectService;
-
-    if (service.getStudentById) {
-      service.getStudentById(this.studentId).subscribe({
-        next: (data: any) => {
-          this.studentDetails = data;
-        },
-        error: () => {
-          this.studentDetails = undefined;
-        }
-      });
-    }
-
-    if (service.getEnrollmentsByStudent) {
-      service.getEnrollmentsByStudent(this.studentId).subscribe({
-        next: (data: any) => {
-          this.enrollments = data;
-        },
-        error: () => {
-          this.enrollments = [];
-        }
-      });
-    }
-
-    if (service.getAllCourses) {
-      service.getAllCourses().subscribe({
-        next: (data: any) => {
-          this.courses = data;
-        },
-        error: () => {
-          this.courses = [];
-        }
-      });
-    }
-  }
-
-  // ---------------- TEACHER ----------------
   loadTeacherData(): void {
-    if (this.teacherId === null) return;
+    this.educonnectService.getTeacherById(this.teacherId).subscribe({
+      next: (response) => {
+        this.teacherDetails = response;
+      },
+      error: (error) => console.log('Error loading loggedIn teacher details', error)
+    });
 
-    const service: any = this.educonnectService;
-
-    if (service.getTeacherById) {
-      service.getTeacherById(this.teacherId).subscribe({
-        next: (data: any) => {
-          this.teacherDetails = data;
-        },
-        error: () => {
-          this.teacherDetails = undefined;
+    this.educonnectService.getCoursesByTeacherId(this.teacherId).subscribe({
+      next: (response) => {
+        this.courses = response;
+        if (this.courses.length > 0) {
+          this.selectedCourseId = this.courses[0].courseId;
+          this.loadEnrollments(this.selectedCourseId);
         }
-      });
-    }
+      },
+      error: (error) => console.log('Error loading courses', error)
+    });
 
-    if (service.getAllCourseByTeacherId) {
-      service.getAllCourseByTeacherId(this.teacherId).subscribe({
-        next: (data: any) => {
-          this.courses = data;
-        },
-        error: () => {
-          this.courses = [];
-        }
-      });
-    }
-
-    if (service.getAllStudents) {
-      service.getAllStudents().subscribe({
-        next: (data: any) => {
-          this.students = data;
-        },
-        error: () => {
-          this.students = [];
-        }
-      });
-    }
-
-    if (service.getAllEnrollments) {
-      service.getAllEnrollments().subscribe({
-        next: (data: any) => {
-          this.teacherEnrollments = data;
-        },
-        error: () => {
-          this.teacherEnrollments = [];
-        }
-      });
-    }
+    this.educonnectService.getAllStudents().subscribe({
+      next: (response) => {
+        this.students = response;
+      },
+      error: (error) => console.log('Error loading all students.', error)
+    });
   }
 
-  editProfile(): void {
-    if (this.role === 'STUDENT') {
-      this.router.navigate(['/student-edit']);
-    } else if (this.role === 'TEACHER') {
-      this.router.navigate(['/teacher-edit']);
-    }
+  loadStudentData(): void {
+    this.educonnectService.getStudentById(this.studentId).subscribe({
+      next: (response) => {
+        this.studentDetails = response;
+      },
+      error: (error) => console.log('Error loading loggedIn student details', error)
+    });
+    this.educonnectService.getEnrollmentsByStudent(this.studentId).subscribe({
+      next: (response) => {
+        this.enrollments = response;
+        if (this.courses.length > 0) {
+          this.selectedCourseId = this.courses[0].courseId;
+          this.loadEnrollments(this.selectedCourseId);
+        }
+      },
+      error: (error) => console.log('Error loading enrollments for logged in student.', error)
+    });
+    this.educonnectService.getAllCourses().subscribe({
+      next: (response) => {
+        this.courses = response;
+      },
+      error: (error) => console.log('Error loading all courses.', error)
+    });
   }
 
-  editCourse(course: any): void {
-    this.router.navigate(['/course-edit', course.courseId]);
+
+  loadEnrollments(courseId: number): void {
+    this.educonnectService.getEnrollmentsByCourse(courseId).subscribe({
+      next: (response) => {
+        this.selectedCourseEnrollment = response;
+      },
+      error: (error) => console.log('Error loading enrollments', error),
+    });
   }
 
-  deleteProfile(): void {
-    if (this.role === 'STUDENT') {
-      this.deleteStudent();
-    } else if (this.role === 'TEACHER') {
-      this.deleteTeacher();
-    }
+  onCourseSelect(course: Course): void {
+    this.selectedCourseId = course.courseId;
+    this.loadEnrollments(this.selectedCourseId);
+  }
+
+  navigateToEditStudent(): void {
+    this.router.navigate(['educonnect/student/edit', this.studentDetails.studentId]);
   }
 
   deleteStudent(): void {
-    const service: any = this.educonnectService;
-    this.successMessage = null;
-    this.errorMessage = null;
+    if (confirm('Are you sure you want to delete your student profile?')) {
+      this.educonnectService.deleteStudent(this.studentId).subscribe({
+        next: () => {
+          this.router.navigate(['/']);
+        },
+        error: (error) => console.error('Error deleting student:', error)
 
-    if (this.studentId !== null && service.deleteStudent) {
-      service.deleteStudent(this.studentId).subscribe(() => {
-        this.studentDetails = undefined;
-        this.enrollments = [];
-        this.successMessage = 'Student profile deleted successfully!';
-      });
+      })
     }
   }
 
-  // ✅ REQUIRED by hidden Day‑25 tests
-  deleteTeacher(): void {
-    const service: any = this.educonnectService;
-    this.successMessage = null;
-    this.errorMessage = null;
+  navigateToEditTeacher(): void {
+    this.router.navigate(['educonnect/teacher/edit', this.teacherDetails.teacherId]);
+  }
 
-    if (this.teacherId !== null && service.deleteTeacher) {
-      service.deleteTeacher(this.teacherId).subscribe(() => {
-        this.teacherDetails = undefined;
-        this.courses = [];
-        this.successMessage = 'Teacher profile deleted successfully!';
-      });
+  deleteTeacher(): void {
+    if (confirm('Are you sure you want to delete your teacher profile?')) {
+      this.educonnectService.deleteTeacher(this.teacherId).subscribe({
+        next: () => {
+          this.router.navigate(['/']);
+        },
+        error: (error) => console.error('Error deleting teacher:', error)
+
+      })
     }
+  }
+
+  navigateToEditCourse(courseId: number): void {
+    this.router.navigate(['educonnect/course/edit', courseId]);
   }
 
   deleteCourse(courseId: number): void {
-    const service: any = this.educonnectService;
-    this.successMessage = null;
-    this.errorMessage = null;
+    if (confirm('Are you sure you want to delete your course profile?')) {
+      this.educonnectService.deleteCourse(courseId).subscribe({
+        next: () => {
+          this.courses = [...this.courses].filter((course) => {
+            return course.courseId !== courseId
+          })
+          // this.router.navigate(['/dashboard']);
+        },
+        error: (error) => console.error('Error deleting course:', error)
 
-    if (service.deleteCourse) {
-      service.deleteCourse(courseId).subscribe(() => {
-        this.courses = this.courses.filter(course => course.courseId !== courseId);
-        this.successMessage = 'Course deleted successfully!';
-      });
+      })
     }
-  }
-
-  removeEnrollment(enrollmentId: number): void {
-    const service: any = this.educonnectService;
-    this.successMessage = null;
-    this.errorMessage = null;
-
-    if (service.deleteEnrollment) {
-      service.deleteEnrollment(enrollmentId).subscribe(() => {
-        this.teacherEnrollments = this.teacherEnrollments.filter(
-          enrollment => enrollment.enrollmentId !== enrollmentId
-        );
-        this.successMessage = 'Enrollment removed successfully!';
-      });
-    }
-  }
-
-  trackByCourseId(index: number, item: any): number {
-    return item.courseId;
-  }
-
-  trackByEnrollmentId(index: number, item: any): number {
-    return item.enrollmentId;
   }
 }

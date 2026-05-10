@@ -1,58 +1,83 @@
-.dashboard-container {-width: 900px;
-  margin: 25px auto;
-  padding: 20px;
-}
+.dashboard {
+  padding: 1.5rem;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eef2f8, #f7f9fc);
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
+  /* Section titles */
+  h3 {
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    border-left: 4px solid #5a8dee;
+    padding-left: 10px;
+  }
 
-.profile-card,
-.section-card {
-  background-color: #f9fafc;
-  border-radius: 10px;
-  padding: 18px;
-  margin-bottom: 20px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-}
+  /* Buttons */
+  button {
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px; /* pill style */
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: #ffffff;
+    color: #5a8dee;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-.course-card {
-  background: white;
-  border-left: 4px solid #1f3c88;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 6px;
-}
+  button:hover {
+    background: #5a8dee;
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
 
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  flex-wrap: wrap;
-}
+  /* List becomes card grid */
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
 
-button {
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  background-color: #1f3c88;
-  color: white;
-  cursor: pointer;
-}
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
 
-button.danger {
-  background-color: #c0392b;
-}
+    li {
+      margin: 0;
+      padding: 1rem;
+      border-radius: 14px;
 
-.success-message {
-  color: green;
-  text-align: center;
-  margin-bottom: 15px;
-}
+      /* Card feel */
+      background: #ffffff;
+      border: 1px solid #eef1f6;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 
-.error-message {
-  color: red;
-  text-align: center;
-  margin-bottom: 15px;
+      font-size: 0.9rem;
+      color: #374151;
+
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Accent bar for uniqueness */
+    li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(180deg, #5a8dee, #7aa6ff);
+    }
+
+    li:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+    }
+  }
 }

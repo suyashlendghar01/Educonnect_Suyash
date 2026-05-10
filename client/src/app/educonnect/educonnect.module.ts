@@ -1,35 +1,41 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
-import { EduconnectRoutingModule } from './educonnect-routing.module';
-
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { TeacherEditComponent } from './components/teacheredit/teacheredit.component';
-import { CourseEditComponent } from './components/courseedit/courseedit.component';
-import { StudentEditComponent } from './components/studentedit/studentedit.component';
-import { EnrollmentComponent } from './components/enrollment/enrollment.component';
+import { EduConnectRoutingModule } from "./educonnect-routing.module";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule } from "@angular/common/http";
+import { StudentCreateComponent } from "./components/studentcreate/studentcreate.component";
+import { TeacherCreateComponent } from "./components/teachercreate/teachercreate.component";
+import { CourseCreateComponent } from "./components/coursecreate/coursecreate.component";
+import { RouterModule } from "@angular/router";
+import { EnrollmentComponent } from "./components/enrollment/enrollment.component";
+import { SharedModule } from "../shared/shared.module";
+import { DashboardComponent } from "./components/dashboard/dashboard.component";
+import { StudentEditComponent } from "./components/studentedit/studentedit.component";
+import { TeacherEditComponent } from "./components/teacheredit/teacheredit.component";
+import { CourseEditComponent } from "./components/courseedit/courseedit.component";
 
 @NgModule({
   declarations: [
+    StudentCreateComponent,
+    TeacherCreateComponent,
+    CourseCreateComponent,
+    EnrollmentComponent,
     DashboardComponent,
-    TeacherEditComponent,
-    CourseEditComponent,
     StudentEditComponent,
-    EnrollmentComponent
+    TeacherEditComponent,
+    CourseEditComponent
   ],
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
-    EduconnectRoutingModule
+    HttpClientModule,
+    FormsModule,
+    RouterModule,
+    EduConnectRoutingModule,
+    SharedModule
   ],
   exports: [
-    DashboardComponent,
-    TeacherEditComponent,
-    CourseEditComponent,
-    StudentEditComponent,
-    EnrollmentComponent
   ]
 })
-export class EduconnectModule {}
+export class EduconnectModule { }

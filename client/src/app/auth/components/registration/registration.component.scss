@@ -1,76 +1,59 @@
-.registration-container {
-  max-width: 550px;
-  margin: 30px auto;
-  padding: 24px;
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-input,
-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.button-group {
+.registration-page {
   display: flex;
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 16px;
+  background-color: #f3f5f9; /* flat soft background instead of plain white */
 }
 
-button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.registration-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px; /* more rounded for modern feel */
+  background: #ffffff;
+
+  /* New shadow style (more depth, less Bootstrap-like) */
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+
+  padding: 2rem 1.6rem;
+
+  /* subtle border to give clean edge */
+  border: 1px solid #eef0f4;
+
+  /* smoother feel */
+  transition: all 0.25s ease;
 }
 
-button[type='submit'] {
-  background-color: #28a745;
-  color: #fff;
+/* More noticeable hover effect */
+.registration-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 16px 35px rgba(0, 0, 0, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-button[type='button'] {
-  background-color: #6c757d;
-  color: #fff;
+/* Add subtle top accent (makes it unique) */
+.registration-card::before {
+  content: "";
+  display: block;
+  height: 4px;
+  width: 100%;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(90deg, #4c8bf5, #6f9cff);
+  margin-bottom: 1rem;
 }
 
-.error {
-  color: #dc3545;
-  font-size: 13px;
-  margin-top: 4px;
-}
+/* Mobile improvements */
+@media (max-width: 480px) {
+  .registration-card {
+    padding: 1.6rem 1.2rem;
+    border-radius: 12px;
+  }
 
-.success-message {
-  margin-top: 15px;
-  color: #28a745;
-  text-align: center;
-  font-weight: 600;
-}
-
-.error-message {
-  margin-top: 15px;
-  color: #dc3545;
-  text-align: center;
-  font-weight: 600;
+  .registration-page {
+    padding: 24px 12px;
+  }
 }

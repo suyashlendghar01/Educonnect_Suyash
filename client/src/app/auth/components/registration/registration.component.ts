@@ -1,120 +1,87 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { UserRegistrationDTO } from '../../../educonnect/models/UserRegistrationDTO';
+import { Router } from '@angular/router';
+
 
 @Component({
-  selector: 'app-registration',
-  templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.scss']
+    selector: 'app-registration',
+    templateUrl: './registration.component.html',
+    styleUrls: ['./registration.component.scss'],
 })
-export class RegistrationComponent implements OnInit {
-  registrationForm!: FormGroup;
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
-  selectedRole: string | null = null;
+export class RegistrationComponent {
+    registrationForm!: FormGroup;
+    successMessage: string | null = null;
+    errorMessage: string | null = null;
+    selectedRole: string | null = null; // To track the selected role
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService
-  ) {}
+    constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) { }
 
-  ngOnInit(): void {
-    this.registrationForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*[0-9]).{8,}$/)]],
-      role: ['', Validators.required],
-      fullName: ['', Validators.required],
-      contactNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      subject: [''],
-      yearsOfExperience: [''],
-      dateOfBirth: [''],
-      address: ['']
-    });
-  }
-
-  onRoleChange(event: Event): void {
-    const role = (event.target as HTMLSelectElement).value;
-    this.selectedRole = role;
-
-    this.registrationForm.get('subject')?.clearValidators();
-    this.registrationForm.get('yearsOfExperience')?.clearValidators();
-    this.registrationForm.get('dateOfBirth')?.clearValidators();
-    this.registrationForm.get('address')?.clearValidators();
-
-    this.registrationForm.get('subject')?.setValue('');
-    this.registrationForm.get('yearsOfExperience')?.setValue('');
-    this.registrationForm.get('dateOfBirth')?.setValue('');
-    this.registrationForm.get('address')?.setValue('');
-
-    if (role === 'TEACHER') {
-      this.registrationForm.get('subject')?.setValidators([Validators.required]);
-      this.registrationForm.get('yearsOfExperience')?.setValidators([
-        Validators.required,
-        Validators.min(1)
-      ]);
-      this.registrationForm.get('address')?.setValidators([Validators.required]);
-    } else if (role === 'STUDENT') {
-      this.registrationForm.get('dateOfBirth')?.setValidators([Validators.required]);
-      this.registrationForm.get('address')?.setValidators([Validators.required]);
+    ngOnInit(): void {
+        this.registrationForm = this.formBuilder.group({
+            username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/)]],
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
+            role: ['', [Validators.required]],
+            fullName: ['', Validators.required],
+            contactNumber: ['', Validators.required],
+            subject: [''], // Teacher-specific field
+            yearsOfExperience: [null], // Teacher-specific field
+            dateOfBirth: [null], // Student-specific field
+            address: [''], // Student-specific field
+        });
     }
 
-    this.registrationForm.get('subject')?.updateValueAndValidity();
-    this.registrationForm.get('yearsOfExperience')?.updateValueAndValidity();
-    this.registrationForm.get('dateOfBirth')?.updateValueAndValidity();
-    this.registrationForm.get('address')?.updateValueAndValidity();
-  }
+    onRoleChange(event: Event): void {
+        const selectElement = event.target as HTMLSelectElement;
+        const role = selectElement.value;
+        this.selectedRole = role;
 
-  onSubmit(): void {
-    this.successMessage = null;
-    this.errorMessage = null;
-
-    if (this.registrationForm.invalid) {
-      this.registrationForm.markAllAsTouched();
-      this.errorMessage = 'Please fill out all fields correctly.';
-      return;
+        // Reset unused fields based on the role
+        if (role === 'TEACHER') {
+            this.registrationForm.patchValue({ dateOfBirth: null, address: '' });
+        } else if (role === 'STUDENT') {
+            this.registrationForm.patchValue({ subject: '', yearsOfExperience: null });
+        }
     }
 
-    const userData: UserRegistrationDTO = this.registrationForm.value;
 
-    this.authService.createUser(userData).subscribe({
-      next: () => {
-        this.successMessage = 'Registration successful!';
-        this.errorMessage = null;
-        this.resetForm();
-      },
-      error: () => {
-        this.errorMessage = 'Registration failed. Please try again.';
-        this.successMessage = null;
-      }
-    });
-  }
+    onSubmit(): void {
+        console.log("dablas button");
+        if (this.registrationForm.valid) {
+            this.authService.createUser(this.registrationForm.value).subscribe({
+                next: (response) => {
+                    console.log("Success");
 
-  resetForm(): void {
-    this.registrationForm.reset({
-      username: '',
-      password: '',
-      role: '',
-      fullName: '',
-      contactNumber: '',
-      email: '',
-      subject: '',
-      yearsOfExperience: '',
-      dateOfBirth: '',
-      address: ''
-    });
+                    console.log(this.registrationForm.value);
+                    this.successMessage = "User successfully registered";
+                    this.errorMessage = null;
+                    this.resetForm();
+                    console.log('Success:', this.successMessage);
+                    this.router.navigate(['/auth'])
+                },
+                error: (error) => {
+                    if (error.error) {
+                        this.errorMessage = error.error;
+                    } else {
+                        this.errorMessage = 'An unexpected error occurred. Please try again later.';
+                    }
+                    this.successMessage = null;
+                    console.error('Error:', this.errorMessage);
+                }
+            })
+        } else {
+            this.errorMessage = 'Please fill out all fields correctly.';
+            this.successMessage = null;
+        }
+    }
 
-    this.registrationForm.get('subject')?.clearValidators();
-    this.registrationForm.get('yearsOfExperience')?.clearValidators();
-    this.registrationForm.get('dateOfBirth')?.clearValidators();
-    this.registrationForm.get('address')?.clearValidators();
+    goToLogin() {
+        this.router.navigate(['../']); // navigates to auth/ (login page)
+    }
 
-    this.registrationForm.get('subject')?.updateValueAndValidity();
-    this.registrationForm.get('yearsOfExperience')?.updateValueAndValidity();
-    this.registrationForm.get('dateOfBirth')?.updateValueAndValidity();
-    this.registrationForm.get('address')?.updateValueAndValidity();
-
-    this.selectedRole = null;
-  }
+    resetForm(): void {
+        this.registrationForm.reset();
+    }
 }

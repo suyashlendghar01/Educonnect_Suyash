@@ -1,88 +1,97 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { EduconnectService } from '../../services/educonnect.service';
-import { AuthService } from '../../../auth/services/auth.service';
-
+import { ActivatedRoute } from '@angular/router';
+import { Course } from '../../models/Course';
+import { Teacher } from '../../models/Teacher';
+import { EduConnectService } from '../../services/educonnect.service';
+import { forkJoin } from 'rxjs';
+ 
 @Component({
-  selector: 'app-courseedit',
-  templateUrl: './courseedit.component.html',
-  styleUrls: ['./courseedit.component.scss']
+    selector: 'app-courseedit',
+    templateUrl: './courseedit.component.html',
+    styleUrls: ['./courseedit.component.scss']
 })
 export class CourseEditComponent implements OnInit {
-  courseForm!: FormGroup;
-  courseId: number = 0;
-  teacherId: number = 1;
-
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
-  course: any;
-
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private educonnectService: EduconnectService,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    this.courseForm = this.fb.group({
-      courseId: [0],
-      courseName: ['', Validators.required],
-      description: ['', Validators.required],
-      teacherId: [0, Validators.required]
-    });
-
-    const auth: any = this.authService;
-    this.teacherId = auth.getTeacherId ? auth.getTeacherId() : this.teacherId;
-
-    const routeId = this.route.snapshot.paramMap.get('id');
-    this.courseId = routeId ? +routeId : 0;
-
-    this.loadCourseDetails();
-  }
-
-  loadCourseDetails(): void {
-    const service: any = this.educonnectService;
-
-    if (service.getCourseById && this.courseId) {
-      service.getCourseById(this.courseId).subscribe((course: any) => {
-        this.course = course;
-        this.courseForm.patchValue({
-          courseId: course.courseId,
-          courseName: course.courseName,
-          description: course.description,
-          teacherId: course.teacherId ?? this.teacherId
+    courseForm!: FormGroup;
+    successMessage: string | null = null;
+    errorMessage: string | null = null;
+    courseId!: number;
+    course!: Course;
+    teacherId!: number;
+    teacher!: Teacher;
+ 
+    constructor(
+        private formBuilder: FormBuilder,
+        private educonnectService: EduConnectService,
+        private route: ActivatedRoute
+    ) { }
+ 
+    ngOnInit(): void {
+        this.teacherId = Number(localStorage.getItem("teacher_id"));
+        this.courseId = Number(this.route.snapshot.paramMap.get('id'));
+        this.initializeForm();
+        this.loadCourseDetails();
+    }
+ 
+    initializeForm(): void {
+        this.courseForm = this.formBuilder.group({
+            teacher: [{ value: '', disabled: true }],
+            courseId: [null],
+            courseName: ['', [Validators.required, Validators.minLength(2)]],
+            description: ['']
         });
-      });
     }
-  }
-
-  onSubmit(): void {
-    this.successMessage = null;
-    this.errorMessage = null;
-
-    if (this.courseForm.invalid) {
-      this.errorMessage = 'Please fill in all required fields.';
-      return;
+ 
+    loadCourseDetails(): void {
+        forkJoin({
+            teacher: this.educonnectService.getTeacherById(this.teacherId),
+            course: this.educonnectService.getCourseById(this.courseId)
+        }).subscribe({
+            next: ({ teacher, course }) => {
+                this.teacher = teacher;
+                this.course = course;
+ 
+                this.courseForm.patchValue({
+                    courseName: this.course.courseName,
+                    description: this.course.description,
+                    teacher: this.teacher.fullName
+                });
+            },
+            error: (error) => console.error('Error loading course or teacher details:', error)
+        });
     }
-
-    const service: any = this.educonnectService;
-    if (service.updateCourse) {
-      service.updateCourse(this.courseForm.value).subscribe(() => {
-        this.successMessage = 'Course updated successfully!';
-      });
+ 
+    onSubmit(): void {
+        if (this.courseForm.valid) {
+            const course: Course = {
+                ...this.courseForm.getRawValue(),
+                courseId: this.course.courseId,
+                teacher: this.teacher,
+            };
+            this.educonnectService.updateCourse(course).subscribe({
+                next: (response) => {
+                    this.errorMessage = null;
+                    console.log(response);
+                    this.courseForm.reset();
+                    this.successMessage = 'Course updated successfully!';
+                },
+                error: (error) => {
+                    this.handleError(error);
+                }
+            });
+        } else {
+            this.errorMessage = 'Please fill out all required fileds correctly';
+            this.successMessage = null;
+        }
     }
-  }
-
-  resetForm(): void {
-    this.courseForm.reset();
-    this.successMessage = null;
-    this.errorMessage = null;
-  }
-
-  goBack(): void {
-    this.router.navigate(['/dashboard']);
-  }
+ 
+    private handleError(error: HttpErrorResponse): void {
+        if (error.error instanceof ErrorEvent) {
+            this.errorMessage = ` ${error.error.message}`;
+        } else {
+            this.errorMessage = `${error.error}`;
+        }
+        this.successMessage = null;
+    }
 }

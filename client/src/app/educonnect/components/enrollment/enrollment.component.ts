@@ -1,38 +1,109 @@
-import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Course } from '../../models/Course';
+import { Enrollment } from '../../models/Enrollment';
+import { Student } from '../../models/Student';
+import { EduConnectService } from '../../services/educonnect.service';
 
 @Component({
-  templateUrl: './enrollment.component.html',
-  styleUrls: ['./enrollment.component.scss']
+    selector: 'app-enrollment',
+    templateUrl: './enrollment.component.html',
+    styleUrls: ['./enrollment.component.scss']
 })
-export class EnrollmentComponent {
-  availableCourses: any[] = [];
-  enrolledCourseIds: number[] = [];
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
+export class EnrollmentComponent implements OnInit {
+    enrollmentForm!: FormGroup;
+    successMessage: string | null = null;
+    errorMessage: string | null = null;
 
-  constructor() {
-    const coursesRaw = localStorage.getItem('allCourses');
-    this.availableCourses = coursesRaw ? JSON.parse(coursesRaw) : [];
+    courses: Course[] = [];
+    students: Student[] = [];
+    role!: string | null;
+    studentId!: number;
+    student!: Student;
 
-    const enrollmentsRaw = localStorage.getItem('currentEnrollments');
-    this.enrolledCourseIds = enrollmentsRaw ? JSON.parse(enrollmentsRaw) : [];
-  }
+    constructor(private formBuilder: FormBuilder, private educonnectService: EduConnectService) { }
 
-  isEnrolled(courseId: number): boolean {
-    return this.enrolledCourseIds.includes(courseId);
-  }
+    ngOnInit(): void {
+        this.role = localStorage.getItem("role");
+        this.studentId = Number(localStorage.getItem("student_id"));
 
-  enroll(course: any): void {
-    this.successMessage = null;
-    this.errorMessage = null;
+        this.initializeForm();
 
-    if (this.isEnrolled(course.courseId)) {
-      this.errorMessage = 'You are already enrolled in this course.';
-      return;
+        if (this.role === 'TEACHER') {
+            this.loadTeacherData();
+        } else if (this.role === 'STUDENT') {
+            this.loadStudentData();
+        }
+
+        this.loadCourses();
     }
 
-    this.enrolledCourseIds.push(course.courseId);
-    localStorage.setItem('currentEnrollments', JSON.stringify(this.enrolledCourseIds));
-    this.successMessage = `Successfully enrolled in ${course.courseName}.`;
-  }
-}
+    initializeForm(): void {
+        this.enrollmentForm = this.formBuilder.group({
+            enrollmentId: [null],
+            student: ['', Validators.required],
+            course: ['', Validators.required],
+            enrollmentDate: [null, Validators.required],
+        });
+    }
+
+    loadTeacherData(): void {
+        this.educonnectService.getAllStudents().subscribe({
+            next: (response) => {
+                this.students = response;
+            },
+            error: (error) => console.log('Error loading students.', error)
+        });
+    }
+
+    loadStudentData(): void {
+        this.educonnectService.getStudentById(this.studentId).subscribe({
+            next: (response) => {
+                this.student = response;
+                console.log(response);
+                this.enrollmentForm.patchValue({ student: this.student.fullName });
+            },
+            error: (error) => console.log('Error loading student details.', error)
+        });
+    }
+
+    loadCourses(): void {
+        this.educonnectService.getAllCourses().subscribe({
+            next: (response) => {
+                this.courses = response;
+            },
+            error: (error) => console.log('Error loading courses.', error)
+        });
+    }
+
+    onSubmit(): void {
+        if (this.enrollmentForm.valid) {
+            const enrollmentData: Enrollment = {
+                ...this.enrollmentForm.getRawValue(),
+                student: this.role === 'STUDENT' ? this.student : this.enrollmentForm.getRawValue().student
+            }
+            this.educonnectService.createEnrollment(enrollmentData).subscribe({
+                next: () => {
+                    this.successMessage = 'Enrollment created successfully!';
+                    this.errorMessage = null;
+                    this.enrollmentForm.reset();
+                    if (this.role === 'STUDENT') {
+                        this.enrollmentForm.patchValue({ student: this.student });
+                        this.enrollmentForm.get('student')?.disable();
+                    }
+                },
+                error: (error) => this.handleError(error)
+            });
+        }
+    }
+
+    private handleError(error: HttpErrorResponse): void {
+        if (error.error instanceof ErrorEvent) {
+            this.errorMessage = ` ${error.error.message}`;
+        } else {
+            this.errorMessage = `${error.error}`;
+        }
+        this.successMessage = null;
+    }
+} 

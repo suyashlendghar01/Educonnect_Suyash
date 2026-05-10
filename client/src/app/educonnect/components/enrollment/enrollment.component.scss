@@ -1,46 +1,144 @@
-.enrollment-container {
-  max-width: 800px;
-  margin: 25px auto;
-  padding: 20px;
+/* Page spacing */
+.container {
+  max-width: 100%;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.course-card {
-  background: #f9fafc;
-  border-left: 4px solid #1f3c88;
-  padding: 14px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-button {
-  margin-top: 10px;
+/* Card redesign */
+.card {
   border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  background-color: #1f3c88;
-  color: white;
-  cursor: pointer;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08),
+              0 4px 10px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: 0.25s ease;
 }
 
-button[disabled] {
-  background-color: #95a5a6;
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.card-header {
+  background: transparent !important;
+  border-bottom: none;
+  padding-top: 1.5rem;
+}
+
+.card-header h3 {
+  font-size: 1.35rem;
+  color: #1f1f1f;
+  letter-spacing: 0.4px;
+}
+
+/* Body */
+.card-body {
+  padding: 1.5rem 1.75rem 1.75rem;
+}
+
+/* Labels */
+.form-label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* Inputs & Select */
+.form-control,
+.form-select {
+  border-radius: 10px;
+  border: 1px solid #e3e6ec;
+  background: #f9fafc;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: #fff;
+  border-color: #5a8dee;
+  box-shadow: 0 0 0 2px rgba(90, 141, 238, 0.15);
+}
+
+/* Disabled / readonly input */
+input[readonly] {
+  background: #eef1f6 !important;
+  color: #666;
   cursor: not-allowed;
 }
 
-.success-message {
-  color: green;
-  text-align: center;
-  margin-bottom: 15px;
+/* Validation text */
+.text-danger {
+  font-size: 0.8rem;
 }
 
-.error-message {
-  color: red;
-  text-align: center;
-  margin-bottom: 15px;
+/* Button */
+.btn {
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.92rem;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* Primary action */
+.btn-success {
+  background: #5a8dee;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: #4976d1;
+}
+
+.btn-success:disabled {
+  background: #cfd6e4;
+  cursor: not-allowed;
+}
+
+/* Alerts */
+.alert {
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  padding: 0.6rem;
+}
+
+.alert-success {
+  background: #e8f6ee;
+  color: #2e8b57;
+}
+
+.alert-danger {
+  background: #fdecec;
+  color: #d64545;
+}
+
+/* Dashboard link */
+.text-primary {
+  color: #5a8dee !important;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.text-primary:hover {
+  text-decoration: underline;
+}
+
+/* Spacing tweaks */
+.mt-5 {
+  margin-top: 42px !important;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .card {
+    border-radius: 12px;
+  }
+
+  .card-body {
+    padding: 1.3rem 1rem;
+  }
 }

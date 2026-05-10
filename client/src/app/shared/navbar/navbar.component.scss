@@ -1,41 +1,93 @@
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #1f3c88;
-  color: white;
-  padding: 12px 20px;
-  flex-wrap: wrap;
-}
+// .navbar {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   background-color: #1f3c88;
+//   color: white;
+//   padding: 12px 20px;
+//   flex-wrap: wrap;
+// }
 
-.brand {
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-}
+// .brand {
+//   font-size: 22px;
+//   font-weight: bold;
+//   cursor: pointer;
+// }
 
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+// .nav-right {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+//   flex-wrap: wrap;
+// }
 
-.welcome-text {
-  font-size: 14px;
-  margin-right: 8px;
-}
+// .welcome-text {
+//   font-size: 14px;
+//   margin-right: 8px;
+// }
 
-button {
-  background-color: #ffffff;
-  color: #1f3c88;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  cursor: pointer;
-  font-weight: 600;
-}
+// button {
+//   background-color: #ffffff;
+//   color: #1f3c88;
+//   border: none;
+//   border-radius: 6px;
+//   padding: 8px 14px;
+//   cursor: pointer;
+//   font-weight: 600;
+// }
 
-button:hover {
-  background-color: #e5e9f2;
+// button:hover {
+//   background-color: #e5e9f2;
+// }
+
+.custom-nav {
+  background-color: #1d3557 !important;
+  padding: 0.7rem 1.5rem;
+
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #fff !important;
+  }
+
+  .nav-link {
+    color: #fff !important;
+    margin-right: 1rem;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* Full red danger logout button */
+  app-logout.logout-chip {
+    background-color: #dc3545 !important; 
+    color: #fff !important;
+    padding: 6px 14px;
+    border-radius: 4px;
+    border: none !important;
+    outline: none !important;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 500;
+  }
+
+}  /* <-- YOU MISSED THIS CLOSING BRACE */
+
+@media (max-width: 991.98px) {
+  .custom-nav .navbar-collapse {
+    padding-top: 0.5rem;
+  }
+
+  .custom-nav .nav-link {
+    margin-right: 0;
+    padding: 0.35rem 0;
+  }
+
+  .custom-nav app-logout.logout-chip {
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
 }
