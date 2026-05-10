@@ -1,83 +1,413 @@
 .dashboard {
-  padding: 1.5rem;
+  padding: 2rem;
   min-height: 100vh;
-  background: linear-gradient(180deg, #eef2f8, #f7f9fc);
 
-  /* Section titles */
+  font-family: "Poppins", sans-serif;
+
+  /* ===== PREMIUM BACKGROUND ===== */
+  background:
+    radial-gradient(circle at top left, rgba(14,165,233,0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 30%),
+    linear-gradient(135deg, #f4f7fb, #e9eef6);
+
+  /* ===== SECTION TITLES ===== */
   h3 {
     margin-top: 2rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
+
     font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    border-left: 4px solid #5a8dee;
-    padding-left: 10px;
+    font-weight: 700;
+
+    color: #121229;
+
+    position: relative;
+    padding-left: 14px;
   }
 
-  /* Buttons */
+  h3::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 2px;
+
+    width: 5px;
+    height: 24px;
+
+    border-radius: 10px;
+
+    background: linear-gradient(180deg, #0ea5e9, #2563eb);
+  }
+
+  /* ===== BUTTONS ===== */
   button {
-    margin-right: 0.5rem;
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px; /* pill style */
+    padding: 10px 18px;
+
     border: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    background: #ffffff;
-    color: #5a8dee;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    color: white;
+
     cursor: pointer;
-    transition: all 0.2s ease;
+
+    margin-right: 10px;
+    margin-top: 10px;
+
+    box-shadow: 0 8px 20px rgba(37,99,235,0.22);
+
+    transition: 0.25s ease;
   }
 
   button:hover {
-    background: #5a8dee;
-    color: #ffffff;
     transform: translateY(-2px);
+
+    box-shadow: 0 12px 28px rgba(37,99,235,0.32);
   }
 
-  /* List becomes card grid */
+  /* ===== CARD GRID ===== */
   ul {
     list-style: none;
+
     padding: 0;
     margin-top: 1rem;
 
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+    gap: 18px;
 
     li {
-      margin: 0;
-      padding: 1rem;
-      border-radius: 14px;
+      position: relative;
 
-      /* Card feel */
-      background: #ffffff;
-      border: 1px solid #eef1f6;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+      padding: 18px;
 
-      font-size: 0.9rem;
+      border-radius: 18px;
+
+      background: rgba(255,255,255,0.82);
+
+      backdrop-filter: blur(10px);
+
+      border: 1px solid rgba(255,255,255,0.5);
+
+      box-shadow:
+        0 12px 30px rgba(0,0,0,0.06);
+
+      font-size: 14px;
       color: #374151;
 
-      transition: all 0.25s ease;
-      position: relative;
       overflow: hidden;
+
+      transition: 0.25s ease;
     }
 
-    /* Accent bar for uniqueness */
+    /* top glow line */
     li::before {
       content: "";
+
       position: absolute;
+
       left: 0;
       top: 0;
-      height: 100%;
-      width: 4px;
-      background: linear-gradient(180deg, #5a8dee, #7aa6ff);
+
+      width: 100%;
+      height: 4px;
+
+      background: linear-gradient(90deg, #0ea5e9, #2563eb);
     }
 
     li:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+
+      box-shadow:
+        0 18px 38px rgba(0,0,0,0.1);
+    }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    ul {
+      grid-template-columns: 1fr;
     }
   }
 }
+
+
+
+
+
+
+
+
+
+// .dashboard {
+//   padding: 2rem;
+//   min-height: 100vh;
+
+//   font-family: "Poppins", sans-serif;
+
+//   /* ===== PREMIUM BACKGROUND ===== */
+//   background:
+//     radial-gradient(circle at top left, rgba(14,165,233,0.12), transparent 28%),
+//     radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent 30%),
+//     linear-gradient(135deg, #f4f7fb, #e9eef6);
+
+//   /* ===== SECTION TITLES ===== */
+//   h3 {
+//     margin-top: 2rem;
+//     margin-bottom: 1rem;
+
+//     font-size: 1.25rem;
+//     font-weight: 700;
+
+//     color: #121229;
+
+//     position: relative;
+//     padding-left: 14px;
+//   }
+
+//   h3::before {
+//     content: "";
+
+//     position: absolute;
+
+//     left: 0;
+//     top: 2px;
+
+//     width: 5px;
+//     height: 24px;
+
+//     border-radius: 10px;
+
+//     background: linear-gradient(180deg, #0ea5e9, #2563eb);
+//   }
+
+//   /* ===== BUTTONS ===== */
+//   button {
+//     padding: 10px 18px;
+
+//     border: none;
+//     border-radius: 10px;
+
+//     font-size: 13px;
+//     font-weight: 600;
+
+//     background: linear-gradient(135deg, #0ea5e9, #2563eb);
+//     color: white;
+
+//     cursor: pointer;
+
+//     margin-right: 10px;
+//     margin-top: 10px;
+
+//     box-shadow: 0 8px 20px rgba(37,99,235,0.22);
+
+//     transition: 0.25s ease;
+//   }
+
+//   button:hover {
+//     transform: translateY(-2px);
+
+//     box-shadow: 0 12px 28px rgba(37,99,235,0.32);
+//   }
+
+//   /* ===== CARD GRID ===== */
+//   ul {
+//     list-style: none;
+
+//     padding: 0;
+//     margin-top: 1rem;
+
+//     display: grid;
+//     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+//     gap: 18px;
+
+//     li {
+//       position: relative;
+
+//       padding: 18px;
+
+//       border-radius: 18px;
+
+//       background: rgba(255,255,255,0.82);
+
+//       backdrop-filter: blur(10px);
+
+//       border: 1px solid rgba(255,255,255,0.5);
+
+//       box-shadow:
+//         0 12px 30px rgba(0,0,0,0.06);
+
+//       font-size: 14px;
+//       color: #374151;
+
+//       overflow: hidden;
+
+//       transition: 0.25s ease;
+//     }
+
+//     /* top glow line */
+//     li::before {
+//       content: "";
+
+//       position: absolute;
+
+//       left: 0;
+//       top: 0;
+
+//       width: 100%;
+//       height: 4px;
+
+//       background: linear-gradient(90deg, #0ea5e9, #2563eb);
+//     }
+
+//     li:hover {
+//       transform: translateY(-4px);
+
+//       box-shadow:
+//         0 18px 38px rgba(0,0,0,0.1);
+//     }
+//   }
+
+//   /* ===== RESPONSIVE ===== */
+//   @media (max-width: 768px) {
+//     padding: 1rem;
+
+//     ul {
+//       grid-template-columns: 1fr;
+//     }
+//   }
+// }
+
+
+
+
+
+
+
+// // .dashboard {
+// //   padding: 1.5rem;
+// //   min-height: 100vh;
+
+// //   background: linear-gradient(135deg, #f4f6fa, #e9edf5);
+// //   font-family: "Poppins", sans-serif;
+
+// //   /* ===== SECTION TITLES ===== */
+// //   h3 {
+// //     margin-top: 2rem;
+// //     margin-bottom: 1rem;
+
+// //     font-size: 1.2rem;
+// //     font-weight: 700;
+
+// //     color: #121229;
+
+// //     position: relative;
+// //     padding-left: 12px;
+// //   }
+
+// //   h3::before {
+// //     content: "";
+// //     position: absolute;
+
+// //     left: 0;
+// //     top: 3px;
+
+// //     width: 4px;
+// //     height: 22px;
+
+// //     border-radius: 10px;
+
+// //     background: linear-gradient(180deg, #0ea5e9, #06b6d4);
+// //   }
+
+// //   /* ===== BUTTONS ===== */
+// //   button {
+// //     padding: 10px 18px;
+
+// //     border: none;
+// //     border-radius: 10px;
+
+// //     font-size: 13px;
+// //     font-weight: 600;
+
+// //     background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+// //     color: white;
+
+// //     cursor: pointer;
+
+// //     margin-right: 10px;
+// //     margin-top: 10px;
+
+// //     box-shadow: 0 8px 20px rgba(14,165,233,0.22);
+
+// //     transition: 0.25s ease;
+// //   }
+
+// //   button:hover {
+// //     transform: translateY(-2px);
+
+// //     box-shadow: 0 12px 28px rgba(14,165,233,0.3);
+// //   }
+
+// //   /* ===== CARD GRID ===== */
+// //   ul {
+// //     list-style: none;
+
+// //     padding: 0;
+// //     margin-top: 1rem;
+
+// //     display: grid;
+// //     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+// //     gap: 16px;
+
+// //     li {
+// //       position: relative;
+
+// //       padding: 18px;
+
+// //       border-radius: 16px;
+
+// //       background: linear-gradient(145deg, #ffffff, #f8fbff);
+
+// //       border: 1px solid rgba(0,0,0,0.04);
+
+// //       box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+
+// //       font-size: 14px;
+// //       color: #374151;
+
+// //       transition: 0.25s ease;
+
+// //       overflow: hidden;
+// //     }
+
+// //     /* accent bar */
+// //     li::before {
+// //       content: "";
+
+// //       position: absolute;
+
+// //       left: 0;
+// //       top: 0;
+
+// //       width: 5px;
+// //       height: 100%;
+
+// //       background: linear-gradient(180deg, #0ea5e9, #06b6d4);
+// //     }
+
+// //     li:hover {
+// //       transform: translateY(-3px);
+
+// //       box-shadow: 0 16px 34px rgba(0,0,0,0.1);
+// //     }
+// //   }
+// // }
